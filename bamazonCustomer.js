@@ -1,9 +1,10 @@
 var mysql = require('mysql')
 var inquirer = require('inquirer')
+var total = 0;
 
 var connection = mysql.createConnection({
     host: "localhost",
-    port: 3300,
+    port: 3306,
 
     user: "root",
 
@@ -18,41 +19,57 @@ connection.connect(function (err) {
     listItems();
 });
 
-
-
 function listItems() {
-    
-        connection.query("SELECT * FROM products", function (err, res) {
-            if (err) throw err;
-            for (i = 0; i < results.length; i++) {
-               console.log("Item_Id: " + res[i].item_id);
-               console.log("Product: " + res[i].product_name);
-               console.log("Department : " + res[i].department_name);
-               console.log("Price: " + res[i].price);
-               console.log("Stock quantity: " + res[i].stock_quantity);
-             
+
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        for (i = 0; i < res.length; i++) {
+            console.log("--------------------------------------")
+            console.log("Item_Id: " + res[i].item_id);
+            console.log("Product: " + res[i].product_name);
+            console.log("Department : " + res[i].department_name);
+            console.log("Price: " + res[i].price);
+            console.log("Stock quantity: " + res[i].stock_quantity);
+            console.log("--------------------------------------")
+        }
+        purchase();
+    });
+}
+function purchase() {
+
+    connection.query("SELECT * FROM products", function (err, res) {
+        if(err) throw err;
+
+        inquirer.prompt([
+            {
+                name: "item_id",
+                type: "input",
+                message: "What is the ID of the product you would like to buy?",
+            },
+            {
+                type: "input",
+                name: "quantity",
+                message: "How many would you like to purchase?",
+                validate: function (value) {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
             }
-            return itemArray;
-        });
-    }
-    //     function productId() {
+        ]).then(function(answer){
+        var findId = ("SELECT * FROM products WHERE ?");
+        connection.query(findId,)
 
-    //         inquirer.prompt([
 
-    //             {
-    //                 name: "item_ID",
-    //                 type: "input",
-    //                 choices:
-    //         },
-    //             message: "What is the ID of the product you would like to buy?"
-    //     },
-    //     {
-    //         type: "input",
-    //             name: "quantity",
-    //                 message: "How many would you like to purchase?"
-    //     }
+// Need to add logic to count the qauntity needed by customer and multiply by price.
+
+
+        })
+        
+
+    });
 
 
 
-    //     // ]).then(function)
-    // }
+}
